@@ -8,13 +8,13 @@ UTFT Screen(SSD1963_800480, 38, 39, 40, 41);
 UTouch  myTouch(43, 42, 44, 45, 46); 
 extern uint8_t BigFont[];
 
-int x, y;
 int lowPriority, mediumPriority;
 // config
 void SetUpPinModes();
 void SetUpLcdConfig();
 void LoadOperatingSystem();
 void InitializeMainMenu();
+void DrawMainButtons();
 // header
 void InitializeHeader();
 void ShowBatteryPercentage();
@@ -55,9 +55,9 @@ void LoadOperatingSystem()
 {
 	Screen.print("Loading operating system", 210, 215);
 	Screen.setColor(255, 255, 255);
-	for (x = 10; x <= 790; x++)
+	for (int x = 10; x <= 790; x++)
 	{
-		Screen.fillRoundRect(10, 235, x, 245);
+		Screen.fillRoundRect(10, 235, x, 240);
 	}
 	delay(500);
 	Screen.clrScr();
@@ -86,6 +86,27 @@ void InitializeMainMenu()
 	ShowGpsStrength();
 	ShowBatteryPercentage();
 	ShowVehicleStatus();
+	DrawMainButtons();
+}
+
+void DrawMainButtons()
+{
+	Screen.setColor(0, 150, 255);
+
+	Screen.fillRoundRect(15, 35, 255, 100);
+	Screen.fillRoundRect(270, 35, 520, 100);
+	Screen.fillRoundRect(535, 35, 785, 100);
+
+	Screen.fillRoundRect(15, 117, 255, 182);
+	Screen.fillRoundRect(270, 117, 520, 182);
+	Screen.fillRoundRect(535, 117, 785, 182);
+
+	Screen.fillRoundRect(15, 199, 255, 264);
+	Screen.fillRoundRect(270, 199, 520, 264);
+	Screen.fillRoundRect(535, 199, 785, 264);
+
+	Screen.setColor(255, 255, 255);
+	Screen.print("Drone", 50, 50);
 }
 
 // header
