@@ -6,7 +6,9 @@
 
 UTFT Screen(SSD1963_800480, 38, 39, 40, 41);  
 UTouch  myTouch(43, 42, 44, 45, 46); 
+extern uint8_t SmallFont[];
 extern uint8_t BigFont[];
+extern uint8_t SevenSegNumFont[];
 
 int lowPriority, mediumPriority;
 // config
@@ -81,6 +83,7 @@ void SetUpLcdConfig()
 
 void InitializeMainMenu()
 {
+	Screen.setFont(SmallFont);
 	InitializeHeader();
 	InitializeFooter();
 	ShowGpsStrength();
@@ -91,7 +94,8 @@ void InitializeMainMenu()
 
 void DrawMainButtons()
 {
-	Screen.setColor(0, 150, 255);
+	Screen.setFont(BigFont);
+	Screen.setColor(0, 10, 255);
 
 	Screen.fillRoundRect(15, 35, 255, 100);
 	Screen.fillRoundRect(270, 35, 520, 100);
@@ -106,7 +110,16 @@ void DrawMainButtons()
 	Screen.fillRoundRect(535, 199, 785, 264);
 
 	Screen.setColor(255, 255, 255);
-	Screen.print("Drone", 50, 50);
+	Screen.setBackColor(0, 10, 255);
+	Screen.print("DRONE", 90, 60);
+	Screen.print("PLANE", 350, 60);
+	Screen.print("CAR", 630, 60);
+	Screen.print("SYSTEM", 80, 142);
+	Screen.print("DISPLAY", 335, 142);
+	Screen.print("CALIBRATION", 570, 142);
+	Screen.print("GPS", 100, 224);
+	Screen.print("TEST", 335, 224);
+	Screen.print("TEST", 570, 224);
 }
 
 // header
@@ -121,9 +134,10 @@ void InitializeHeader()
 
 void ShowBatteryPercentage()
 {
+	Screen.setFont(SmallFont);
 	int batteryRead = analogRead(A0);
 	batteryRead = map(batteryRead, 800,1023,0,100);
-	Screen.print(String(batteryRead) + "%", 700,1);
+	Screen.print(String(batteryRead) + "%", 720,3);
 	Screen.setColor(0, 200, 0);
 	Screen.fillRoundRect(755, 4, 770, 12);
 	Screen.fillRoundRect(760, 1, 798, 15);
@@ -132,14 +146,16 @@ void ShowBatteryPercentage()
 
 void ShowGpsStrength()
 {
-	Screen.print("GPS", 580, 1);
-	Screen.print("68%", 635, 1);
+	Screen.setFont(SmallFont);
+	Screen.print("GPS", 650, 3);
+	Screen.print("68%", 680, 3);
 }
 
 void ShowVehicleStatus()
 {
-	Screen.print("Status:", 10, 1);
-	Screen.print("Ready", 125, 1);
+	Screen.setFont(SmallFont);
+	Screen.print("Status:", 10, 3);
+	Screen.print("Ready", 75, 3);
 }
 
 // footer
