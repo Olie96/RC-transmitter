@@ -20,5 +20,8 @@ void ShowGpsStrength();
 void ShowVehicleStatus();
 void InitializeFooter();
 
+void waitForIt(int x1, int y1, int x2, int y2);
+void ReadTouch();
+
 #endif
 

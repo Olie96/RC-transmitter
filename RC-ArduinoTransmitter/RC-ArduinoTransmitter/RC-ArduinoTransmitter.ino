@@ -16,6 +16,7 @@ void setup()
 
 void loop()
 {
+	ReadTouch();
 	if (mediumPriority > MEDIUM_PRIORITY)
 	{
 		mediumPriority = 0;

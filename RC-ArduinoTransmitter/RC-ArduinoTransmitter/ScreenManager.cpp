@@ -2,8 +2,22 @@
 #include <UTouch.h>
 #include "ScreenManager.h"
 
+#define FIRST_COLUMN_MAIN_MENU_BEGIN_X	15 
+#define FIRST_COLUMN_MAIN_MENU_END_X	255 
+#define SECOND_COLUMN_MAIN_MENU_BEGIN_X 270 
+#define SECOND_COLUMN_MAIN_MENU_END_X	520 
+#define THIRD_COLUMN_MAIN_MENU_BEGIN_X	535 
+#define THIRD_COLUMN_MAIN_MENU_END_X	785 
+
+#define FIRST_ROW_MAIN_MENU_BEGIN_Y		35 
+#define FIRST_ROW_MAIN_MENU_END_Y		100 
+#define SECOND_ROW_MAIN_MENU_BEGIN_Y	117 
+#define SECOND_ROW_MAIN_MENU_END_Y		182 
+#define THIRD_ROW_MAIN_MENU_BEGIN_Y		199 
+#define THIRD_ROW_MAIN_MENU_END_Y		264 
+
 UTFT Screen(SSD1963_800480, 38, 39, 40, 41);
-UTouch  myTouch(43, 42, 44, 45, 46);
+UTouch  Touch(43, 42, 44, 45, 46);
 extern uint8_t SmallFont[];
 extern uint8_t BigFont[];
 extern uint8_t SevenSegNumFont[];
@@ -16,6 +30,7 @@ void LoadOperatingSystem()
 	{
 		Screen.fillRoundRect(10, 235, x, 240);
 	}
+
 	delay(500);
 	Screen.clrScr();
 }
@@ -24,8 +39,8 @@ void SetUpLcdConfig()
 {
 	Screen.InitLCD();
 	Screen.clrScr();
-	myTouch.InitTouch();
-	myTouch.setPrecision(PREC_MEDIUM);
+	Touch.InitTouch();
+	Touch.setPrecision(PREC_MEDIUM);
 	Screen.setFont(BigFont);
 }
 
@@ -45,17 +60,17 @@ void DrawMainButtons()
 	Screen.setFont(BigFont);
 	Screen.setColor(0, 10, 255);
 
-	Screen.fillRoundRect(15, 35, 255, 100);
-	Screen.fillRoundRect(270, 35, 520, 100);
-	Screen.fillRoundRect(535, 35, 785, 100);
+	Screen.fillRoundRect(FIRST_COLUMN_MAIN_MENU_BEGIN_X, FIRST_ROW_MAIN_MENU_BEGIN_Y, FIRST_COLUMN_MAIN_MENU_END_X, FIRST_ROW_MAIN_MENU_END_Y);
+	Screen.fillRoundRect(SECOND_COLUMN_MAIN_MENU_BEGIN_X, FIRST_ROW_MAIN_MENU_BEGIN_Y, SECOND_COLUMN_MAIN_MENU_END_X, FIRST_ROW_MAIN_MENU_END_Y);
+	Screen.fillRoundRect(THIRD_COLUMN_MAIN_MENU_BEGIN_X, FIRST_ROW_MAIN_MENU_BEGIN_Y, THIRD_COLUMN_MAIN_MENU_END_X, FIRST_ROW_MAIN_MENU_END_Y);
 
-	Screen.fillRoundRect(15, 117, 255, 182);
-	Screen.fillRoundRect(270, 117, 520, 182);
-	Screen.fillRoundRect(535, 117, 785, 182);
+	Screen.fillRoundRect(FIRST_COLUMN_MAIN_MENU_BEGIN_X, SECOND_ROW_MAIN_MENU_BEGIN_Y, FIRST_COLUMN_MAIN_MENU_END_X, SECOND_ROW_MAIN_MENU_END_Y);
+	Screen.fillRoundRect(SECOND_COLUMN_MAIN_MENU_BEGIN_X, SECOND_ROW_MAIN_MENU_BEGIN_Y, SECOND_COLUMN_MAIN_MENU_END_X, SECOND_ROW_MAIN_MENU_END_Y);
+	Screen.fillRoundRect(THIRD_COLUMN_MAIN_MENU_BEGIN_X, SECOND_ROW_MAIN_MENU_BEGIN_Y, THIRD_COLUMN_MAIN_MENU_END_X, SECOND_ROW_MAIN_MENU_END_Y);
 
-	Screen.fillRoundRect(15, 199, 255, 264);
-	Screen.fillRoundRect(270, 199, 520, 264);
-	Screen.fillRoundRect(535, 199, 785, 264);
+	Screen.fillRoundRect(FIRST_COLUMN_MAIN_MENU_BEGIN_X, THIRD_ROW_MAIN_MENU_BEGIN_Y, FIRST_COLUMN_MAIN_MENU_END_X, THIRD_ROW_MAIN_MENU_END_Y);
+	Screen.fillRoundRect(SECOND_COLUMN_MAIN_MENU_BEGIN_X, THIRD_ROW_MAIN_MENU_BEGIN_Y, SECOND_COLUMN_MAIN_MENU_END_X, THIRD_ROW_MAIN_MENU_END_Y);
+	Screen.fillRoundRect(THIRD_COLUMN_MAIN_MENU_BEGIN_X, THIRD_ROW_MAIN_MENU_BEGIN_Y, THIRD_COLUMN_MAIN_MENU_END_X, THIRD_ROW_MAIN_MENU_END_Y);
 
 	Screen.setColor(255, 255, 255);
 	Screen.setBackColor(0, 10, 255);
@@ -112,7 +127,32 @@ void InitializeFooter()
 	Screen.setColor(255, 255, 255);
 }
 
+void ReadTouch()
+{
+	if (Touch.dataAvailable())
+	{
+		Touch.read();
+		int x = Touch.getX();
+		int y = Touch.getY();
+		Screen.print("X:" + String(x) + " Y:" + String(y), 30, 465);
+		if ((y >= 45) && (y <= 100))
+		{
+			if ((x >= 20) && (x <= 255))
+			{
+				waitForIt(FIRST_COLUMN_MAIN_MENU_BEGIN_X, FIRST_ROW_MAIN_MENU_BEGIN_Y, FIRST_COLUMN_MAIN_MENU_END_X, FIRST_ROW_MAIN_MENU_END_Y);
+			}
+		}
+	}
+}
 
 
-
+void waitForIt(int x1, int y1, int x2, int y2)
+{
+	Screen.setColor(255, 0, 0);
+	Screen.drawRoundRect(x1, y1, x2, y2);
+	while (Touch.dataAvailable())
+		Touch.read();
+	Screen.setColor(255, 255, 255);
+	Screen.drawRoundRect(x1, y1, x2, y2);
+}
 
