@@ -24,19 +24,36 @@ enum enum_menu : uint8_t
 	gps = 8
 };
 
+#pragma region Initialize system
+
 void SetUpLcdConfig();
+
+#pragma endregion
+
+#pragma region Main menu
+
 void LoadOperatingSystem();
 void InitializeMainMenu();
 void DrawMainButtons();
-// header
-void InitializeHeader();
 
-void ShowVehicleStatus();
-void InitializeFooter();
+#pragma endregion
+
+#pragma region Header / Footer
+
+void RefreshHeader();
+void RefreshFooter();
+void PrintFooter(String text, int x);
+void PrintHeader(String text, int x);
+
+#pragma endregion
+
+#pragma region Touch
 
 void waitForIt(int x1, int y1, int x2, int y2);
 enum_menu ReadTouch(enum_menu menu);
 enum_menu MainMenuButtonPressed(int x, int y);
+
+#pragma endregion
 
 #endif
 

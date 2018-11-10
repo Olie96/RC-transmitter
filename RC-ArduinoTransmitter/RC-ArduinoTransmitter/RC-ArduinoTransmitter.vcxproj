@@ -117,12 +117,14 @@
     <ClInclude Include="BatteryManager.h" />
     <ClInclude Include="GpsManager.h" />
     <ClInclude Include="ScreenManager.h" />
+    <ClInclude Include="VehicleManager.h" />
     <ClInclude Include="__vm\.RC-ArduinoTransmitter.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BatteryManager.cpp" />
     <ClCompile Include="GpsManager.cpp" />
     <ClCompile Include="ScreenManager.cpp" />
+    <ClCompile Include="VehicleManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

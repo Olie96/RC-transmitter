@@ -1,13 +1,19 @@
 #include "BatteryManager.h"
 #include "GpsManager.h"
+#include "VehicleManager.h"
 #include "ScreenManager.h"
 
+#pragma region Screen variables 
 
 UTFT Screen(SSD1963_800480, 38, 39, 40, 41);
 UTouch  Touch(43, 42, 44, 45, 46);
 extern uint8_t SmallFont[];
 extern uint8_t BigFont[];
 extern uint8_t SevenSegNumFont[];
+
+#pragma endregion
+
+#pragma region Button positions
 
 #define FIRST_COLUMN_MAIN_MENU_BEGIN_X	15 
 #define FIRST_COLUMN_MAIN_MENU_END_X	255 
@@ -22,6 +28,10 @@ extern uint8_t SevenSegNumFont[];
 #define SECOND_ROW_MAIN_MENU_END_Y		182 
 #define THIRD_ROW_MAIN_MENU_BEGIN_Y		199 
 #define THIRD_ROW_MAIN_MENU_END_Y		264 
+
+#pragma endregion
+
+#pragma region Initialize system
 
 void LoadOperatingSystem()
 {
@@ -45,14 +55,54 @@ void SetUpLcdConfig()
 	Screen.setFont(BigFont);
 }
 
+#pragma endregion
+
+#pragma region Header
+
+void PrintHeader(String text, int x)
+{
+	Screen.print(text, x, 3);
+}
+
+void RefreshHeader()
+{
+	Screen.setColor(0, 10, 255);
+	Screen.setBackColor(0, 10, 255);
+	Screen.fillRoundRect(0, 0, 799, 18);
+	Screen.setColor(255, 255, 255);
+
+	Screen.setFont(SmallFont);
+	PrintHeader("GPS " + String(GetGpsStrength()) + "%", 650);
+	PrintHeader("Status: " + String(GetVehicleStatus()), 10);
+	PrintHeader(String(GetBatteryPercentage()) + "%", 730);
+}
+
+#pragma endregion
+
+#pragma region Footer
+
+void PrintFooter(String text, int x)
+{
+	Screen.print(text, x, 465);
+}
+
+
+void RefreshFooter()
+{
+	Screen.setColor(0, 10, 255);
+	Screen.setBackColor(0, 10, 255);
+	Screen.fillRoundRect(0, 462, 800, 480);
+	Screen.setColor(255, 255, 255);
+}
+
+#pragma endregion
+
+#pragma region Main menu
+
 void InitializeMainMenu()
 {
-	Screen.setFont(SmallFont);
-	InitializeHeader();
-	InitializeFooter();
-
-
-	ShowVehicleStatus();
+	RefreshHeader();
+	RefreshFooter();
 	DrawMainButtons();
 }
 
@@ -86,33 +136,7 @@ void DrawMainButtons()
 	Screen.print("TEST", 620, 224);
 }
 
-void InitializeHeader()
-{
-	Screen.setFont(SmallFont);
-	Screen.print("GPS " + String(GetGpsStrength()) + "%", 650, 3);
-	Screen.print(String(GetBatteryPercentage()) + "%", 720, 3);
-	ShowVehicleStatus();
-
-	Screen.setColor(0, 10, 255);
-	Screen.setBackColor(0, 10, 255);
-	Screen.fillRoundRect(0, 0, 799, 18);
-	Screen.setColor(255, 255, 255);
-}
-
-void ShowVehicleStatus()
-{
-	Screen.setFont(SmallFont);
-	Screen.print("Status:", 10, 3);
-	Screen.print("Ready", 75, 3);
-}
-
-void InitializeFooter()
-{
-	Screen.setColor(0, 10, 255);
-	Screen.setBackColor(0, 10, 255);
-	Screen.fillRoundRect(0, 462, 800, 480);
-	Screen.setColor(255, 255, 255);
-}
+#pragma endregion
 
 enum_menu ReadTouch(enum_menu menu)
 {
@@ -122,9 +146,10 @@ enum_menu ReadTouch(enum_menu menu)
 		Touch.read();
 		int x = Touch.getX();
 		int y = Touch.getY();
-		Screen.print("X:" + String(x) + " Y:" + String(y), 30, 465);
+		PrintFooter("X:" + String(x) + " Y:" + String(y), 30);
 		if (menu == main_menu)
 		{
+			Screen.clrScr();
 			selectedMenu = MainMenuButtonPressed(x, y);
 		}
 		if (menu == drone)
