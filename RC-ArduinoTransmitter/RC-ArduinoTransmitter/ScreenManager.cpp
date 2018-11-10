@@ -1,6 +1,13 @@
-#include <UTFT.h>
-#include <UTouch.h>
+#include "BatteryManager.h"
+#include "GpsManager.h"
 #include "ScreenManager.h"
+
+
+UTFT Screen(SSD1963_800480, 38, 39, 40, 41);
+UTouch  Touch(43, 42, 44, 45, 46);
+extern uint8_t SmallFont[];
+extern uint8_t BigFont[];
+extern uint8_t SevenSegNumFont[];
 
 #define FIRST_COLUMN_MAIN_MENU_BEGIN_X	15 
 #define FIRST_COLUMN_MAIN_MENU_END_X	255 
@@ -15,12 +22,6 @@
 #define SECOND_ROW_MAIN_MENU_END_Y		182 
 #define THIRD_ROW_MAIN_MENU_BEGIN_Y		199 
 #define THIRD_ROW_MAIN_MENU_END_Y		264 
-
-UTFT Screen(SSD1963_800480, 38, 39, 40, 41);
-UTouch  Touch(43, 42, 44, 45, 46);
-extern uint8_t SmallFont[];
-extern uint8_t BigFont[];
-extern uint8_t SevenSegNumFont[];
 
 void LoadOperatingSystem()
 {
@@ -49,8 +50,8 @@ void InitializeMainMenu()
 	Screen.setFont(SmallFont);
 	InitializeHeader();
 	InitializeFooter();
-	ShowGpsStrength();
-	ShowBatteryPercentage();
+
+
 	ShowVehicleStatus();
 	DrawMainButtons();
 }
@@ -87,29 +88,15 @@ void DrawMainButtons()
 
 void InitializeHeader()
 {
+	Screen.setFont(SmallFont);
+	Screen.print("GPS " + String(GetGpsStrength()) + "%", 650, 3);
+	Screen.print(String(GetBatteryPercentage()) + "%", 720, 3);
+	ShowVehicleStatus();
+
 	Screen.setColor(0, 10, 255);
 	Screen.setBackColor(0, 10, 255);
 	Screen.fillRoundRect(0, 0, 799, 18);
 	Screen.setColor(255, 255, 255);
-}
-
-void ShowBatteryPercentage()
-{
-	Screen.setFont(SmallFont);
-	int batteryRead = analogRead(A0);
-	batteryRead = map(batteryRead, 800, 1023, 0, 100);
-	Screen.print(String(batteryRead) + "%", 720, 3);
-	Screen.setColor(0, 200, 0);
-	Screen.fillRoundRect(755, 4, 770, 12);
-	Screen.fillRoundRect(760, 1, 798, 15);
-	Screen.setColor(255, 255, 255);
-}
-
-void ShowGpsStrength()
-{
-	Screen.setFont(SmallFont);
-	Screen.print("GPS", 650, 3);
-	Screen.print("68%", 680, 3);
 }
 
 void ShowVehicleStatus()
@@ -127,24 +114,26 @@ void InitializeFooter()
 	Screen.setColor(255, 255, 255);
 }
 
-void ReadTouch()
+enum_menu ReadTouch(enum_menu menu)
 {
+	enum enum_menu selectedMenu = menu;
 	if (Touch.dataAvailable())
 	{
 		Touch.read();
 		int x = Touch.getX();
 		int y = Touch.getY();
 		Screen.print("X:" + String(x) + " Y:" + String(y), 30, 465);
-		if ((y >= 45) && (y <= 100))
+		if (menu == main_menu)
 		{
-			if ((x >= 20) && (x <= 255))
-			{
-				waitForIt(FIRST_COLUMN_MAIN_MENU_BEGIN_X, FIRST_ROW_MAIN_MENU_BEGIN_Y, FIRST_COLUMN_MAIN_MENU_END_X, FIRST_ROW_MAIN_MENU_END_Y);
-			}
+			selectedMenu = MainMenuButtonPressed(x, y);
+		}
+		if (menu == drone)
+		{
+			Screen.clrScr();
 		}
 	}
+	return selectedMenu;
 }
-
 
 void waitForIt(int x1, int y1, int x2, int y2)
 {
@@ -154,5 +143,65 @@ void waitForIt(int x1, int y1, int x2, int y2)
 		Touch.read();
 	Screen.setColor(255, 255, 255);
 	Screen.drawRoundRect(x1, y1, x2, y2);
+}
+
+enum_menu MainMenuButtonPressed(int x, int y)
+{
+	enum enum_menu selectedMenu;
+	if ((y >= FIRST_ROW_MAIN_MENU_BEGIN_Y) && (y <= FIRST_ROW_MAIN_MENU_END_Y))
+	{
+		if ((x >= FIRST_COLUMN_MAIN_MENU_BEGIN_X) && (x <= FIRST_COLUMN_MAIN_MENU_END_X))
+		{
+			waitForIt(FIRST_COLUMN_MAIN_MENU_BEGIN_X, FIRST_ROW_MAIN_MENU_BEGIN_Y, FIRST_COLUMN_MAIN_MENU_END_X, FIRST_ROW_MAIN_MENU_END_Y);
+			selectedMenu = drone;
+		}
+		else if ((x >= SECOND_COLUMN_MAIN_MENU_BEGIN_X) && (x <= SECOND_COLUMN_MAIN_MENU_END_X))
+		{
+			waitForIt(SECOND_COLUMN_MAIN_MENU_BEGIN_X, FIRST_ROW_MAIN_MENU_BEGIN_Y, SECOND_COLUMN_MAIN_MENU_END_X, FIRST_ROW_MAIN_MENU_END_Y);
+			selectedMenu = plane;
+		}
+		else if ((x >= THIRD_COLUMN_MAIN_MENU_BEGIN_X) && (x <= THIRD_COLUMN_MAIN_MENU_END_X))
+		{
+			waitForIt(THIRD_COLUMN_MAIN_MENU_BEGIN_X, FIRST_ROW_MAIN_MENU_BEGIN_Y, THIRD_COLUMN_MAIN_MENU_END_X, FIRST_ROW_MAIN_MENU_END_Y);
+			selectedMenu = car;
+		}
+	}
+
+	else if ((y >= SECOND_ROW_MAIN_MENU_BEGIN_Y) && (y <= SECOND_ROW_MAIN_MENU_END_Y))
+	{
+		if ((x >= FIRST_COLUMN_MAIN_MENU_BEGIN_X) && (x <= FIRST_COLUMN_MAIN_MENU_END_X))
+		{
+			waitForIt(FIRST_COLUMN_MAIN_MENU_BEGIN_X, SECOND_ROW_MAIN_MENU_BEGIN_Y, FIRST_COLUMN_MAIN_MENU_END_X, SECOND_ROW_MAIN_MENU_END_Y);
+			selectedMenu = system_info;
+		}
+		else if ((x >= SECOND_COLUMN_MAIN_MENU_BEGIN_X) && (x <= SECOND_COLUMN_MAIN_MENU_END_X))
+		{
+			waitForIt(SECOND_COLUMN_MAIN_MENU_BEGIN_X, SECOND_ROW_MAIN_MENU_BEGIN_Y, SECOND_COLUMN_MAIN_MENU_END_X, SECOND_ROW_MAIN_MENU_END_Y);
+			selectedMenu = display;
+		}
+		else if ((x >= THIRD_COLUMN_MAIN_MENU_BEGIN_X) && (x <= THIRD_COLUMN_MAIN_MENU_END_X))
+		{
+			waitForIt(THIRD_COLUMN_MAIN_MENU_BEGIN_X, SECOND_ROW_MAIN_MENU_BEGIN_Y, THIRD_COLUMN_MAIN_MENU_END_X, SECOND_ROW_MAIN_MENU_END_Y);
+			selectedMenu = calibration;
+		}
+	}
+
+	else if ((y >= THIRD_ROW_MAIN_MENU_BEGIN_Y) && (y <= THIRD_ROW_MAIN_MENU_END_Y))
+	{
+		if ((x >= FIRST_COLUMN_MAIN_MENU_BEGIN_X) && (x <= FIRST_COLUMN_MAIN_MENU_END_X))
+		{
+			waitForIt(FIRST_COLUMN_MAIN_MENU_BEGIN_X, THIRD_ROW_MAIN_MENU_BEGIN_Y, FIRST_COLUMN_MAIN_MENU_END_X, THIRD_ROW_MAIN_MENU_END_Y);
+			selectedMenu = gps;
+		}
+		else if ((x >= SECOND_COLUMN_MAIN_MENU_BEGIN_X) && (x <= SECOND_COLUMN_MAIN_MENU_END_X))
+		{
+			waitForIt(SECOND_COLUMN_MAIN_MENU_BEGIN_X, THIRD_ROW_MAIN_MENU_BEGIN_Y, SECOND_COLUMN_MAIN_MENU_END_X, THIRD_ROW_MAIN_MENU_END_Y);
+		}
+		else if ((x >= THIRD_COLUMN_MAIN_MENU_BEGIN_X) && (x <= THIRD_COLUMN_MAIN_MENU_END_X))
+		{
+			waitForIt(THIRD_COLUMN_MAIN_MENU_BEGIN_X, THIRD_ROW_MAIN_MENU_BEGIN_Y, THIRD_COLUMN_MAIN_MENU_END_X, THIRD_ROW_MAIN_MENU_END_Y);
+		}
+	}
+	return selectedMenu;
 }
 

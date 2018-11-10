@@ -5,6 +5,7 @@
 
 int lowPriority, mediumPriority;
 void SetUpPinModes();
+enum enum_menu currentMenu;
 
 void setup()
 {
@@ -12,20 +13,19 @@ void setup()
 	SetUpLcdConfig();
 	LoadOperatingSystem();
 	InitializeMainMenu();
+	currentMenu = main_menu;
 }
 
 void loop()
 {
-	ReadTouch();
+	currentMenu = ReadTouch(currentMenu);
 	if (mediumPriority > MEDIUM_PRIORITY)
 	{
 		mediumPriority = 0;
 	}
 	if (lowPriority > LOW_PRIORITY)
 	{
-		ShowGpsStrength();
-		ShowBatteryPercentage();
-		ShowVehicleStatus();
+		InitializeHeader();
 		lowPriority = 0;
 	}
 
