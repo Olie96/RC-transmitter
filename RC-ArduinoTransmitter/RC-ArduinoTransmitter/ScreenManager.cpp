@@ -5,6 +5,8 @@
 
 #pragma region Screen variables 
 
+int screenBacklight = 790;
+int backlight = 255;
 UTFT Screen(SSD1963_800480, 38, 39, 40, 41);
 UTouch  Touch(43, 42, 44, 45, 46);
 extern uint8_t SmallFont[];
@@ -14,6 +16,8 @@ extern uint8_t SevenSegNumFont[];
 #pragma endregion
 
 #pragma region Button positions
+
+#pragma region Main menu
 
 #define FIRST_COLUMN_MAIN_MENU_BEGIN_X	15 
 #define FIRST_COLUMN_MAIN_MENU_END_X	255 
@@ -31,6 +35,14 @@ extern uint8_t SevenSegNumFont[];
 
 #pragma endregion
 
+#pragma region Drone menu
+
+
+
+#pragma endregion
+
+#pragma endregion
+
 #pragma region Initialize system
 
 void LoadOperatingSystem()
@@ -43,7 +55,6 @@ void LoadOperatingSystem()
 	}
 
 	delay(500);
-	Screen.clrScr();
 }
 
 void SetUpLcdConfig()
@@ -57,6 +68,15 @@ void SetUpLcdConfig()
 
 #pragma endregion
 
+#pragma region Screen
+
+void ClearScreen()
+{
+	Screen.clrScr();
+}
+
+#pragma endregion
+
 #pragma region Header
 
 void PrintHeader(String text, int x)
@@ -64,12 +84,15 @@ void PrintHeader(String text, int x)
 	Screen.print(text, x, 3);
 }
 
-void RefreshHeader()
+void RefreshHeader(int refresh)
 {
-	Screen.setColor(0, 10, 255);
-	Screen.setBackColor(0, 10, 255);
-	Screen.fillRoundRect(0, 0, 799, 18);
-	Screen.setColor(255, 255, 255);
+	if (refresh == 1)
+	{
+		Screen.setColor(0, 10, 255);
+		Screen.setBackColor(0, 10, 255);
+		Screen.fillRoundRect(0, 0, 799, 18);
+		Screen.setColor(255, 255, 255);
+	}
 
 	Screen.setFont(SmallFont);
 	PrintHeader("GPS " + String(GetGpsStrength()) + "%", 650);
@@ -86,13 +109,16 @@ void PrintFooter(String text, int x)
 	Screen.print(text, x, 465);
 }
 
-
-void RefreshFooter()
+void RefreshFooter(int refresh)
 {
-	Screen.setColor(0, 10, 255);
-	Screen.setBackColor(0, 10, 255);
-	Screen.fillRoundRect(0, 462, 800, 480);
-	Screen.setColor(255, 255, 255);
+	if (refresh == 1)
+	{
+		Screen.setColor(0, 10, 255);
+		Screen.setBackColor(0, 10, 255);
+		Screen.fillRoundRect(0, 462, 800, 480);
+		Screen.setColor(255, 255, 255);
+	}
+	PrintFooter("backlight: " + String(map(backlight, 0,255 ,0, 100)) + "%", 650);
 }
 
 #pragma endregion
@@ -101,10 +127,49 @@ void RefreshFooter()
 
 void InitializeMainMenu()
 {
-	RefreshHeader();
-	RefreshFooter();
+	RefreshHeader(1);
+	RefreshFooter(1);
 	DrawMainButtons();
 }
+
+#pragma endregion
+
+enum_menu ReadTouch(enum_menu menu)
+{
+	enum enum_menu selectedMenu = menu;
+	if (Touch.dataAvailable())
+	{
+		Touch.read();
+		int x = Touch.getX();
+		int y = Touch.getY();
+		PrintFooter("X:" + String(x) + " Y:" + String(y), 30);
+		if (menu == main_menu)
+		{
+			selectedMenu = MainMenuButtonPressed(x, y, menu);
+		}
+		if (menu == drone)
+		{
+			selectedMenu = DroneMenuButtonPressed(x, y, menu);
+		}
+		if (menu == display)
+		{
+			selectedMenu = DisplayMenuButtonPressed(x, y, menu);
+		}
+	}
+	return selectedMenu;
+}
+
+void waitForIt(int x1, int y1, int x2, int y2)
+{
+	Screen.setColor(255, 0, 0);
+	Screen.drawRoundRect(x1, y1, x2, y2);
+	while (Touch.dataAvailable())
+		Touch.read();
+	Screen.setColor(255, 255, 255);
+	Screen.drawRoundRect(x1, y1, x2, y2);
+}
+
+#pragma region Draw buttons
 
 void DrawMainButtons()
 {
@@ -136,43 +201,59 @@ void DrawMainButtons()
 	Screen.print("TEST", 620, 224);
 }
 
+void DrawDroneMenu()
+{
+	DrawBackButton();
+	Screen.drawRoundRect(70, 350, 270, 360);
+	Screen.drawLine(170,350,170,360);
+
+	Screen.drawRoundRect(30, 120, 40, 320);
+	Screen.drawLine(30, 220, 40, 220);
+
+	Screen.drawRoundRect(529, 350, 729, 360);
+	Screen.drawLine(629, 350, 629, 360);
+
+	Screen.drawRoundRect(769, 120, 759, 320);
+	Screen.drawLine(769, 220, 759, 220);
+
+	Screen.drawRoundRect(60, 50, 739, 330);
+	DrawDrone();
+}
+
+void DrawBackButton()
+{
+	Screen.setColor(0, 10, 255);
+	Screen.fillRoundRect(15, 420, 100, 450);
+	Screen.setColor(255, 255, 255);
+	Screen.setBackColor(0, 10, 255);
+	Screen.setFont(SmallFont);
+	Screen.print("<- Back", 27, 430);
+}
+
+void DrawDrone()
+{
+	//Screen.drawBitmap();
+}
+
+void DrawDisplayMenu()
+{
+	DrawBackButton();
+
+	Screen.setColor(0, 10, 255);
+	Screen.fillRoundRect(15, 50, 300, 100);
+
+	Screen.fillRoundRect(15, 120, screenBacklight, 140);
+	Screen.setColor(255, 255, 255);
+	Screen.drawRoundRect(15, 120, 790, 140);
+}
+
 #pragma endregion
 
-enum_menu ReadTouch(enum_menu menu)
+#pragma region Buttons pressed
+
+enum_menu MainMenuButtonPressed(int x, int y, enum_menu menu)
 {
 	enum enum_menu selectedMenu = menu;
-	if (Touch.dataAvailable())
-	{
-		Touch.read();
-		int x = Touch.getX();
-		int y = Touch.getY();
-		PrintFooter("X:" + String(x) + " Y:" + String(y), 30);
-		if (menu == main_menu)
-		{
-			Screen.clrScr();
-			selectedMenu = MainMenuButtonPressed(x, y);
-		}
-		if (menu == drone)
-		{
-			Screen.clrScr();
-		}
-	}
-	return selectedMenu;
-}
-
-void waitForIt(int x1, int y1, int x2, int y2)
-{
-	Screen.setColor(255, 0, 0);
-	Screen.drawRoundRect(x1, y1, x2, y2);
-	while (Touch.dataAvailable())
-		Touch.read();
-	Screen.setColor(255, 255, 255);
-	Screen.drawRoundRect(x1, y1, x2, y2);
-}
-
-enum_menu MainMenuButtonPressed(int x, int y)
-{
-	enum enum_menu selectedMenu;
 	if ((y >= FIRST_ROW_MAIN_MENU_BEGIN_Y) && (y <= FIRST_ROW_MAIN_MENU_END_Y))
 	{
 		if ((x >= FIRST_COLUMN_MAIN_MENU_BEGIN_X) && (x <= FIRST_COLUMN_MAIN_MENU_END_X))
@@ -230,3 +311,63 @@ enum_menu MainMenuButtonPressed(int x, int y)
 	return selectedMenu;
 }
 
+enum_menu DroneMenuButtonPressed(int x, int y, enum_menu menu)
+{
+	enum enum_menu selectedMenu = menu;
+	if ((y >= 420) && (y <= 450))
+	{
+		if ((x >= 15) && (x <= 100))
+		{
+			waitForIt(15, 420, 100, 450);
+			selectedMenu = main_menu;
+		}
+	}
+	return selectedMenu;
+}
+
+enum_menu DisplayMenuButtonPressed(int x, int y, enum_menu menu)
+{
+	enum enum_menu selectedMenu = menu;
+	if ((y >= 50) && (y <= 100))
+	{
+		if ((x >= 15) && (x <= 300))
+		{
+			waitForIt(15, 50, 300, 100);
+			selectedMenu = main_menu;
+		}
+	}
+	else if((y >= 120) && (y <= 140))
+	{
+		if ((x >= 15) && (x <= 790))
+		{
+			SetBrightness();
+		}
+	}
+	return selectedMenu;
+}
+
+
+void SetBrightness()
+{
+	while (Touch.dataAvailable())
+	{
+		Touch.read();
+		screenBacklight = Touch.getX();
+
+		if (screenBacklight > 790)
+			screenBacklight = 790;
+		else if (screenBacklight < 30)
+			screenBacklight = 30;
+
+		backlight = map(screenBacklight, 15,790,0,255);
+
+		analogWrite(8, backlight);
+		Screen.setColor(0,0,0);
+		Screen.fillRoundRect(screenBacklight, 121, 790, 139);
+		Screen.setColor(0, 10, 255);		
+		Screen.fillRoundRect(12, 121, screenBacklight + 3, 139);
+		delay(10);
+	}
+}
+
+#pragma endregion

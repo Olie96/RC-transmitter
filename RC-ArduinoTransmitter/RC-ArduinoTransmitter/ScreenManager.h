@@ -34,26 +34,46 @@ void SetUpLcdConfig();
 
 void LoadOperatingSystem();
 void InitializeMainMenu();
-void DrawMainButtons();
 
 #pragma endregion
 
 #pragma region Header / Footer
 
-void RefreshHeader();
-void RefreshFooter();
+void RefreshHeader(int refresh);
+void RefreshFooter(int refresh);
 void PrintFooter(String text, int x);
 void PrintHeader(String text, int x);
 
 #pragma endregion
 
+#pragma region Screen
+
+void ClearScreen();
+void SetBrightness();
+
+#pragma endregion
+
+
 #pragma region Touch
 
 void waitForIt(int x1, int y1, int x2, int y2);
 enum_menu ReadTouch(enum_menu menu);
-enum_menu MainMenuButtonPressed(int x, int y);
+enum_menu MainMenuButtonPressed(int x, int y, enum_menu menu);
+enum_menu DroneMenuButtonPressed(int x, int y, enum_menu menu);
+enum_menu DisplayMenuButtonPressed(int x, int y, enum_menu menu);
 
 #pragma endregion
+
+#pragma region Draw buttons
+
+void DrawMainButtons();
+void DrawDroneMenu();
+void DrawDrone();
+void DrawDisplayMenu();
+void DrawBackButton();
+
+#pragma endregion
+
 
 #endif
 

@@ -1,4 +1,3 @@
-#include "VehicleManager.h"
 #include "ScreenManager.h"
 
 #define LOW_PRIORITY 1000
@@ -13,6 +12,7 @@ void setup()
 	SetUpPinModes();
 	SetUpLcdConfig();
 	LoadOperatingSystem();
+	ClearScreen();
 	InitializeMainMenu();
 	currentMenu = main_menu;
 }
@@ -23,7 +23,25 @@ void loop()
 
 	if (currentMenu == main_menu && currentMenu != previousMenu)
 	{
+		ClearScreen();
+		RefreshHeader(1);
+		RefreshFooter(1);
 		DrawMainButtons();
+
+	}
+	else if(currentMenu == drone && currentMenu != previousMenu)
+	{
+		ClearScreen();
+		RefreshHeader(1);
+		RefreshFooter(1);
+		DrawDroneMenu();
+	}
+	else if (currentMenu == display && currentMenu != previousMenu)
+	{
+		ClearScreen();
+		RefreshHeader(1);
+		RefreshFooter(1);
+		DrawDisplayMenu();
 	}
 
 	if (mediumPriority > MEDIUM_PRIORITY)
@@ -32,8 +50,8 @@ void loop()
 	}
 	if (lowPriority > LOW_PRIORITY)
 	{
-		RefreshHeader();
-		RefreshFooter();
+		RefreshHeader(0);
+		RefreshFooter(0);
 		lowPriority = 0;
 	}
 
@@ -46,6 +64,6 @@ void loop()
 void SetUpPinModes()
 {
 	pinMode(8, OUTPUT);
-	digitalWrite(8, HIGH);
+	analogWrite(8, 255);
 	pinMode(A0, INPUT);
 }
