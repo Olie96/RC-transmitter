@@ -24,6 +24,13 @@ enum enum_menu : uint8_t
 	gps = 8
 };
 
+enum enum_text_position : uint8_t
+{
+	center = 0,
+	left = 1,
+	right = 2
+};
+
 #pragma region Initialize system
 
 void SetUpLcdConfig();
@@ -48,8 +55,10 @@ void PrintHeader(String text, int x);
 
 #pragma region Screen
 
+int GetBacklightValue();
 void ClearScreen();
 void SetBrightness();
+void DrawButton(int xBegin, int yBegin, int xEnd, int yEnd, String text, enum_text_position textPosition, uint8_t font[]);
 
 #pragma endregion
 

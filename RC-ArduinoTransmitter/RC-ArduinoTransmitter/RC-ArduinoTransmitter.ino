@@ -1,7 +1,7 @@
 #include "ScreenManager.h"
 
-#define LOW_PRIORITY 1000
-#define MEDIUM_PRIORITY 500
+#define LOW_PRIORITY 2000
+#define MEDIUM_PRIORITY 1000
 
 int lowPriority, mediumPriority;
 void SetUpPinModes();
@@ -60,10 +60,9 @@ void loop()
 	previousMenu = currentMenu;
 }
 
-
 void SetUpPinModes()
 {
 	pinMode(8, OUTPUT);
-	analogWrite(8, 255);
+	analogWrite(8, GetBacklightValue());
 	pinMode(A0, INPUT);
 }
