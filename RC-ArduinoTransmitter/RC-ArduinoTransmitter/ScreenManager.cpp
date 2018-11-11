@@ -59,6 +59,16 @@ extern uint8_t SevenSegNumFont[];
 
 #pragma endregion
 
+#pragma region Back button
+
+#define BACK_BUTTON_Y_BEGIN 420 
+#define BACK_BUTTON_Y_END 450
+#define BACK_BUTTON_X_BEGIN 15 
+#define BACK_BUTTON_X_END 100
+
+#pragma endregion
+
+
 #pragma endregion
 
 #pragma region Initialize system
@@ -352,11 +362,11 @@ enum_menu MainMenuButtonPressed(int x, int y, enum_menu menu)
 enum_menu DroneMenuButtonPressed(int x, int y, enum_menu menu)
 {
 	enum enum_menu selectedMenu = menu;
-	if ((y >= 420) && (y <= 450))
+	if ((y >= BACK_BUTTON_Y_BEGIN) && (y <= BACK_BUTTON_Y_END))
 	{
-		if ((x >= 15) && (x <= 100))
+		if ((x >= BACK_BUTTON_X_BEGIN) && (x <= BACK_BUTTON_X_END))
 		{
-			waitForIt(15, 420, 100, 450);
+			waitForIt(BACK_BUTTON_X_BEGIN, BACK_BUTTON_Y_BEGIN, BACK_BUTTON_X_END, BACK_BUTTON_Y_END);
 			selectedMenu = main_menu;
 		}
 	}
@@ -366,11 +376,11 @@ enum_menu DroneMenuButtonPressed(int x, int y, enum_menu menu)
 enum_menu DisplayMenuButtonPressed(int x, int y, enum_menu menu)
 {
 	enum enum_menu selectedMenu = menu;
-	if ((y >= 50) && (y <= 100))
+	if ((y >= BACK_BUTTON_Y_BEGIN) && (y <= BACK_BUTTON_Y_END))
 	{
-		if ((x >= 15) && (x <= 300))
+		if ((x >= BACK_BUTTON_X_BEGIN) && (x <= BACK_BUTTON_X_END))
 		{
-			waitForIt(15, 50, 300, 100);
+			waitForIt(BACK_BUTTON_X_BEGIN, BACK_BUTTON_Y_BEGIN, BACK_BUTTON_X_END, BACK_BUTTON_Y_END);
 			selectedMenu = main_menu;
 		}
 	}
