@@ -14,6 +14,8 @@ void setup()
 	LoadOperatingSystem();
 	ClearScreen();
 	InitializeMainMenu();
+
+	delay(10000);
 	currentMenu = main_menu;
 }
 
@@ -62,7 +64,7 @@ void loop()
 
 void SetUpPinModes()
 {
-	pinMode(8, OUTPUT);
-	analogWrite(8, GetBacklightValue());
+	pinMode(20, OUTPUT);
+	analogWrite(20, GetBacklightValue());
 	pinMode(A0, INPUT);
 }

@@ -2,11 +2,13 @@
 #include "GpsManager.h"
 #include "VehicleManager.h"
 #include "ScreenManager.h"
+#include <UTouch.h>
+#include <UTFT.h>
 
 #pragma region Screen variables 
 
 int screenBacklight = 790;
-int backlight = 100;
+int backlight = 150;
 UTFT Screen(SSD1963_800480, 38, 39, 40, 41);
 UTouch  Touch(43, 42, 44, 45, 46);
 extern uint8_t SmallFont[];
