@@ -1,3 +1,4 @@
+#include <memorysaver.h>
 #include "ScreenManager.h"
 
 #define LOW_PRIORITY 2000
@@ -15,8 +16,8 @@ void setup()
 	ClearScreen();
 	InitializeMainMenu();
 
-	delay(10000);
-	currentMenu = main_menu;
+	delay(100);
+	currentMenu = display;
 }
 
 void loop()
