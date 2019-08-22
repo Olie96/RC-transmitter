@@ -96,13 +96,6 @@ void SetUpLcdConfig()
 	Screen.setFont(BigFont);
 }
 
-void InitializeMainMenu()
-{
-	RefreshHeader(1);
-	RefreshFooter(1);
-	DrawMainButtons();
-}
-
 #pragma endregion
 
 #pragma region Header
@@ -146,7 +139,7 @@ void RefreshFooter(int refresh)
 		Screen.fillRoundRect(0, 462, 800, 480);
 		Screen.setColor(255, 255, 255);
 	}
-	Screen.setFont(SmallFont);
+	//Screen.setFont(SmallFont);
 	PrintFooter("backlight: " + String(map(backlight, 0,255 ,0, 100)) + "%", 650);
 }
 
@@ -166,37 +159,40 @@ int GetBacklightValue()
 
 #pragma endregion
 
-enum_menu ReadTouch(enum_menu menu)
+enum_menu ReadTouch(enum_menu currMenu)
 {
-	enum enum_menu selectedMenu = menu;
-	if (Touch.dataAvailable())
+	enum_menu menu = empty;
+	if (TouchDataAvailable() > 0)
 	{
 		Touch.read();
 		int x = Touch.getX();
 		int y = Touch.getY();
 		PrintFooter("X:" + String(x) + " Y:" + String(y), 30);
-		if (menu == main_menu)
+		if (currMenu == main_menu)
 		{
-			selectedMenu = MainMenuButtonPressed(x, y, menu);
+			menu = MainMenuButtonPressed(x, y);
 		}
-		if (menu == drone)
+		if (currMenu == drone)
 		{
-			selectedMenu = DroneMenuButtonPressed(x, y, menu);
+			menu = DroneMenuButtonPressed(x, y);
 		}
-		if (menu == display)
+		if (currMenu == display)
 		{
-			selectedMenu = DisplayMenuButtonPressed(x, y, menu);
+			menu = DisplayMenuButtonPressed(x, y);
 		}
 	}
-	return selectedMenu;
+	else
+	{
+		
+	}
+	return menu;
 }
 
 void waitForIt(int x1, int y1, int x2, int y2)
 {
 	Screen.setColor(255, 0, 0);
 	Screen.drawRoundRect(x1, y1, x2, y2);
-	while (Touch.dataAvailable())
-		Touch.read();
+	while (TouchDataAvailable() > 0) { }
 	Screen.setColor(255, 255, 255);
 	Screen.drawRoundRect(x1, y1, x2, y2);
 }
@@ -301,25 +297,25 @@ void DrawButton(int xBegin, int yBegin, int xEnd, int yEnd, String text, enum_te
 
 #pragma region Buttons pressed
 
-enum_menu MainMenuButtonPressed(int x, int y, enum_menu menu)
+enum_menu MainMenuButtonPressed(int x, int y)
 {
-	enum enum_menu selectedMenu = menu;
+	enum_menu temp = empty;
 	if ((y >= FIRST_ROW_MAIN_MENU_BEGIN_Y) && (y <= FIRST_ROW_MAIN_MENU_END_Y))
 	{
 		if ((x >= FIRST_COLUMN_MAIN_MENU_BEGIN_X) && (x <= FIRST_COLUMN_MAIN_MENU_END_X))
 		{
 			waitForIt(FIRST_COLUMN_MAIN_MENU_BEGIN_X, FIRST_ROW_MAIN_MENU_BEGIN_Y, FIRST_COLUMN_MAIN_MENU_END_X, FIRST_ROW_MAIN_MENU_END_Y);
-			selectedMenu = drone;
+			temp = drone;
 		}
 		else if ((x >= SECOND_COLUMN_MAIN_MENU_BEGIN_X) && (x <= SECOND_COLUMN_MAIN_MENU_END_X))
 		{
 			waitForIt(SECOND_COLUMN_MAIN_MENU_BEGIN_X, FIRST_ROW_MAIN_MENU_BEGIN_Y, SECOND_COLUMN_MAIN_MENU_END_X, FIRST_ROW_MAIN_MENU_END_Y);
-			selectedMenu = plane;
+			temp = plane;
 		}
 		else if ((x >= THIRD_COLUMN_MAIN_MENU_BEGIN_X) && (x <= THIRD_COLUMN_MAIN_MENU_END_X))
 		{
 			waitForIt(THIRD_COLUMN_MAIN_MENU_BEGIN_X, FIRST_ROW_MAIN_MENU_BEGIN_Y, THIRD_COLUMN_MAIN_MENU_END_X, FIRST_ROW_MAIN_MENU_END_Y);
-			selectedMenu = car;
+			temp = car;
 		}
 	}
 
@@ -328,17 +324,17 @@ enum_menu MainMenuButtonPressed(int x, int y, enum_menu menu)
 		if ((x >= FIRST_COLUMN_MAIN_MENU_BEGIN_X) && (x <= FIRST_COLUMN_MAIN_MENU_END_X))
 		{
 			waitForIt(FIRST_COLUMN_MAIN_MENU_BEGIN_X, SECOND_ROW_MAIN_MENU_BEGIN_Y, FIRST_COLUMN_MAIN_MENU_END_X, SECOND_ROW_MAIN_MENU_END_Y);
-			selectedMenu = system_info;
+			temp = system_info;
 		}
 		else if ((x >= SECOND_COLUMN_MAIN_MENU_BEGIN_X) && (x <= SECOND_COLUMN_MAIN_MENU_END_X))
 		{
 			waitForIt(SECOND_COLUMN_MAIN_MENU_BEGIN_X, SECOND_ROW_MAIN_MENU_BEGIN_Y, SECOND_COLUMN_MAIN_MENU_END_X, SECOND_ROW_MAIN_MENU_END_Y);
-			selectedMenu = display;
+			temp = display;
 		}
 		else if ((x >= THIRD_COLUMN_MAIN_MENU_BEGIN_X) && (x <= THIRD_COLUMN_MAIN_MENU_END_X))
 		{
 			waitForIt(THIRD_COLUMN_MAIN_MENU_BEGIN_X, SECOND_ROW_MAIN_MENU_BEGIN_Y, THIRD_COLUMN_MAIN_MENU_END_X, SECOND_ROW_MAIN_MENU_END_Y);
-			selectedMenu = calibration;
+			temp = calibration;
 		}
 	}
 
@@ -347,7 +343,7 @@ enum_menu MainMenuButtonPressed(int x, int y, enum_menu menu)
 		if ((x >= FIRST_COLUMN_MAIN_MENU_BEGIN_X) && (x <= FIRST_COLUMN_MAIN_MENU_END_X))
 		{
 			waitForIt(FIRST_COLUMN_MAIN_MENU_BEGIN_X, THIRD_ROW_MAIN_MENU_BEGIN_Y, FIRST_COLUMN_MAIN_MENU_END_X, THIRD_ROW_MAIN_MENU_END_Y);
-			selectedMenu = gps;
+			temp = gps;
 		}
 		else if ((x >= SECOND_COLUMN_MAIN_MENU_BEGIN_X) && (x <= SECOND_COLUMN_MAIN_MENU_END_X))
 		{
@@ -358,32 +354,32 @@ enum_menu MainMenuButtonPressed(int x, int y, enum_menu menu)
 			waitForIt(THIRD_COLUMN_MAIN_MENU_BEGIN_X, THIRD_ROW_MAIN_MENU_BEGIN_Y, THIRD_COLUMN_MAIN_MENU_END_X, THIRD_ROW_MAIN_MENU_END_Y);
 		}
 	}
-	return selectedMenu;
+	return temp;
 }
 
-enum_menu DroneMenuButtonPressed(int x, int y, enum_menu menu)
+enum_menu DroneMenuButtonPressed(int x, int y)
 {
-	enum enum_menu selectedMenu = menu;
+	enum_menu temp = empty;
 	if ((y >= BACK_BUTTON_Y_BEGIN) && (y <= BACK_BUTTON_Y_END))
 	{
 		if ((x >= BACK_BUTTON_X_BEGIN) && (x <= BACK_BUTTON_X_END))
 		{
 			waitForIt(BACK_BUTTON_X_BEGIN, BACK_BUTTON_Y_BEGIN, BACK_BUTTON_X_END, BACK_BUTTON_Y_END);
-			selectedMenu = main_menu;
+			temp = main_menu;
 		}
 	}
-	return selectedMenu;
+	return temp;
 }
 
-enum_menu DisplayMenuButtonPressed(int x, int y, enum_menu menu)
+enum_menu DisplayMenuButtonPressed(int x, int y)
 {
-	enum enum_menu selectedMenu = menu;
+	enum_menu temp = empty;
 	if ((y >= BACK_BUTTON_Y_BEGIN) && (y <= BACK_BUTTON_Y_END))
 	{
 		if ((x >= BACK_BUTTON_X_BEGIN) && (x <= BACK_BUTTON_X_END))
 		{
 			waitForIt(BACK_BUTTON_X_BEGIN, BACK_BUTTON_Y_BEGIN, BACK_BUTTON_X_END, BACK_BUTTON_Y_END);
-			selectedMenu = main_menu;
+			temp = main_menu;
 		}
 	}
 	else if((y >= 360) && (y <= 380))
@@ -393,12 +389,12 @@ enum_menu DisplayMenuButtonPressed(int x, int y, enum_menu menu)
 			SetBrightness();
 		}
 	}
-	return selectedMenu;
+	return temp;
 }
 
 void SetBrightness()
 {
-	while (Touch.dataAvailable())
+	while (TouchDataAvailable() > 0)
 	{
 		Touch.read();
 		screenBacklight = Touch.getX();
@@ -417,6 +413,12 @@ void SetBrightness()
 		Screen.fillRoundRect(12, 361, screenBacklight + 3, 379);
 		delay(5);
 	}
+}
+
+int TouchDataAvailable()
+{
+	Touch.read();
+	return Touch.getX() + Touch.getY();
 }
 
 #pragma endregion

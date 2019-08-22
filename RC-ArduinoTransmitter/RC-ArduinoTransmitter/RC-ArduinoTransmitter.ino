@@ -1,12 +1,12 @@
 #include <memorysaver.h>
 #include "ScreenManager.h"
 
-#define LOW_PRIORITY 2000
+#define LOW_PRIORITY 3000
 #define MEDIUM_PRIORITY 1000
 
 int lowPriority, mediumPriority;
 void SetUpPinModes();
-enum enum_menu currentMenu, previousMenu;
+enum enum_menu selectedMenu, currentMenu = empty;
 
 void setup()
 {
@@ -14,39 +14,42 @@ void setup()
 	SetUpLcdConfig();
 	LoadOperatingSystem();
 	ClearScreen();
-	InitializeMainMenu();
+	RefreshHeader(1);
+	RefreshFooter(1);
+	DrawMainButtons();
 
 	delay(100);
-	currentMenu = display;
+	currentMenu = selectedMenu = main_menu;
 }
 
 void loop()
 {
-	currentMenu = ReadTouch(currentMenu);
-
-	if (currentMenu == main_menu && currentMenu != previousMenu)
+	selectedMenu = ReadTouch(currentMenu);
+	if (selectedMenu == main_menu && selectedMenu != currentMenu)
 	{
 		ClearScreen();
 		RefreshHeader(1);
 		RefreshFooter(1);
 		DrawMainButtons();
-
+		currentMenu = selectedMenu;
 	}
-	else if(currentMenu == drone && currentMenu != previousMenu)
+	else if(selectedMenu == drone && selectedMenu != currentMenu)
 	{
 		ClearScreen();
 		RefreshHeader(1);
 		RefreshFooter(1);
 		DrawDroneMenu();
+		currentMenu = selectedMenu;
 	}
-	else if (currentMenu == display && currentMenu != previousMenu)
+	else if (selectedMenu == display && selectedMenu != currentMenu)
 	{
 		ClearScreen();
 		RefreshHeader(1);
 		RefreshFooter(1);
 		DrawDisplayMenu();
+		currentMenu = selectedMenu;
 	}
-
+	
 	if (mediumPriority > MEDIUM_PRIORITY)
 	{
 		mediumPriority = 0;
@@ -57,10 +60,9 @@ void loop()
 		RefreshFooter(0);
 		lowPriority = 0;
 	}
-
+	
 	mediumPriority++;
 	lowPriority++;
-	previousMenu = currentMenu;
 }
 
 void SetUpPinModes()

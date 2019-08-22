@@ -19,7 +19,8 @@ enum enum_menu : uint8_t
 	system_info = 5,
 	settings = 6,
 	calibration = 7,
-	gps = 8
+	gps = 8,
+	empty = 99
 };
 
 enum enum_text_position : uint8_t
@@ -63,11 +64,12 @@ void DrawButton(int xBegin, int yBegin, int xEnd, int yEnd, String text, enum_te
 
 #pragma region Touch
 
+int TouchDataAvailable();
 void waitForIt(int x1, int y1, int x2, int y2);
-enum_menu ReadTouch(enum_menu menu);
-enum_menu MainMenuButtonPressed(int x, int y, enum_menu menu);
-enum_menu DroneMenuButtonPressed(int x, int y, enum_menu menu);
-enum_menu DisplayMenuButtonPressed(int x, int y, enum_menu menu);
+enum_menu ReadTouch(enum_menu currMenu);
+enum_menu MainMenuButtonPressed(int x, int y);
+enum_menu DroneMenuButtonPressed(int x, int y);
+enum_menu DisplayMenuButtonPressed(int x, int y);
 
 #pragma endregion
 
