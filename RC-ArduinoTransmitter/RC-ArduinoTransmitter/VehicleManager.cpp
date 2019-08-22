@@ -4,7 +4,7 @@
 
 #include "VehicleManager.h"
 
-enum_vehicle_status GetVehicleStatus()
+String GetVehicleStatus()
 {
-	return Ready;
+	return "Ready";
 }

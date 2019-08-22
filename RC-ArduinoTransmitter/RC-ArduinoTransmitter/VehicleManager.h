@@ -16,7 +16,5 @@ enum enum_vehicle_status : uint8_t
 	Running
 };
 
-enum_vehicle_status GetVehicleStatus();
-
 #endif
 

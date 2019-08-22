@@ -83,6 +83,7 @@ void DrawBackButton();
 
 #pragma endregion
 
+String GetVehicleStatus();
 
 #endif
 
