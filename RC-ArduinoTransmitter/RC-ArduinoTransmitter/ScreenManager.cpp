@@ -8,7 +8,7 @@
 #pragma region Screen variables 
 
 int screenBacklight = 790;
-int backlight = 150;
+int backlight = 255;
 UTFT Screen(SSD1963_800480, 38, 39, 40, 41);
 UTouch  Touch(43, 42, 44, 45, 46);
 extern uint8_t SmallFont[];
@@ -222,15 +222,42 @@ void DrawDroneMenu()
 
 	Screen.drawRoundRect(LEFT_DONGLE_UD_POSITION_START_X, LEFT_DONGLE_UD_POSITION_START_Y, LEFT_DONGLE_UD_POSITION_END_X, LEFT_DONGLE_UD_POSITION_END_Y);
 	Screen.drawLine(LEFT_DONGLE_UD_POSITION_START_X, LEFT_DONGLE_UD_POSITION_START_Y + 100, LEFT_DONGLE_UD_POSITION_END_X, LEFT_DONGLE_UD_POSITION_START_Y + 100);
-
+	
 	Screen.drawRoundRect(RIGHT_DONGLE_LR_POSITION_START_X, RIGHT_DONGLE_LR_POSITION_START_Y, RIGHT_DONGLE_LR_POSITION_END_X, RIGHT_DONGLE_LR_POSITION_END_Y);
 	Screen.drawLine(RIGHT_DONGLE_LR_POSITION_START_X + 100, RIGHT_DONGLE_LR_POSITION_START_Y, RIGHT_DONGLE_LR_POSITION_START_X + 100, RIGHT_DONGLE_LR_POSITION_END_Y);
-
+	
 	Screen.drawRoundRect(RIGHT_DONGLE_UD_POSITION_START_X, RIGHT_DONGLE_UD_POSITION_START_Y, RIGHT_DONGLE_UD_POSITION_END_X, RIGHT_DONGLE_UD_POSITION_END_Y);
 	Screen.drawLine(RIGHT_DONGLE_UD_POSITION_START_X, RIGHT_DONGLE_UD_POSITION_START_Y + 100, RIGHT_DONGLE_UD_POSITION_END_X, RIGHT_DONGLE_UD_POSITION_START_Y + 100);
 
 	Screen.drawRoundRect(60, 50, 739, 330);
 	DrawDrone();
+}
+
+void DrawProgressBar(int startX, int startY, int length, int debth, int value, enum_progress_bar_mode type, enum_orientation orientation)
+{
+	Screen.setColor(255, 255, 255);
+	int xEnd = startX + length;
+	int yEnd = startY + debth;
+	if(orientation == landscape)
+	{
+		value = map(value, 0,100, startX, xEnd);
+		Screen.drawRoundRect(startX, startY, xEnd, yEnd);
+		Screen.fillRoundRect(startX, startY, value, yEnd);
+		Screen.setColor(0, 0, 0);
+		Screen.fillRoundRect(value, startY + 1, xEnd, yEnd - 1);
+		if (type == two_sided)
+		{
+			Screen.drawLine(startX + (length / 2), startY, startX + (length / 2), startY + debth);
+		}
+	}
+	else
+	{
+		Screen.drawRoundRect(startY, startX, yEnd, xEnd);
+		if (type == two_sided)
+		{
+			//Screen.drawLine(startY, startX + (length / 2), startY + debth, startX + (length / 2));
+		}
+	}
 }
 
 void DrawBackButton()

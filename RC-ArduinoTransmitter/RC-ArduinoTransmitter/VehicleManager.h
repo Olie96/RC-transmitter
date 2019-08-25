@@ -16,5 +16,13 @@ enum enum_vehicle_status : uint8_t
 	Running
 };
 
+class DongleData
+{
+public: int LeftX;
+		int LeftY;
+		int RightX;
+		int RightY;
+};
+
 #endif
 

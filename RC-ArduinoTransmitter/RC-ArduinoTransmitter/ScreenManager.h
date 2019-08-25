@@ -8,6 +8,7 @@
 #else
 	#include "WProgram.h"
 #endif
+#include "VehicleManager.h"
 
 enum enum_menu : uint8_t
 {
@@ -28,6 +29,18 @@ enum enum_text_position : uint8_t
 	center = 0,
 	left = 1,
 	right = 2
+};
+
+enum enum_progress_bar_mode : uint8_t
+{
+	one_sided = 0,
+	two_sided = 1
+};
+
+enum enum_orientation : uint8_t
+{
+	landscape = 0,
+	portrait = 1
 };
 
 #pragma region Initialize system
@@ -84,6 +97,8 @@ void DrawBackButton();
 #pragma endregion
 
 String GetVehicleStatus();
+DongleData ReadDongleValues();
+void DrawProgressBar(int startX, int startY, int length, int debth, int value, enum_progress_bar_mode type, enum_orientation orientation);
 
 #endif
 
