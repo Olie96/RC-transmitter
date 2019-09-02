@@ -2,7 +2,7 @@
 #include "ScreenManager.h"
 
 #define LOW_PRIORITY 3000
-#define MEDIUM_PRIORITY 1000
+#define MEDIUM_PRIORITY 200
 #define HIGH_PRIORITY 10
 
 int lowPriority, mediumPriority, highPriority;
@@ -13,12 +13,13 @@ void setup()
 {
 	SetUpPinModes();
 	SetUpLcdConfig();
+	DrawLogo();
 	LoadOperatingSystem();
 	ClearScreen();
 	RefreshHeader(1);
 	RefreshFooter(1);
-	//DrawMainButtons();
-	delay(100);
+	
+	DrawMainButtons();
 	currentMenu = selectedMenu = main_menu;
 }
 
@@ -38,6 +39,7 @@ void loop()
 		ClearScreen();
 		RefreshHeader(1);
 		RefreshFooter(1);
+		DrawDrone();
 		DrawDroneMenu();
 		currentMenu = selectedMenu;
 	}
@@ -53,10 +55,12 @@ void loop()
 	if (highPriority > HIGH_PRIORITY)
 	{
 		highPriority = 0;
+		
 	}
 	if (mediumPriority > MEDIUM_PRIORITY)
 	{
 		mediumPriority = 0;
+		
 	}
 	if (lowPriority > LOW_PRIORITY)
 	{
@@ -64,12 +68,10 @@ void loop()
 		RefreshFooter(0);
 		lowPriority = 0;
 	}
-	DongleData w = ReadDongleValues();
-	// 110
-	// 633
-	int re = map(w.LeftX, 100, 640, 0, 100);
-	PrintHeader(String(re), 150);
-	DrawProgressBar(30, 30, 200, 10, re, one_sided, landscape);
+	DongleData result = ReadDongleValues();
+	//rawProgressBar(30, 30, 200, 10, map(result.RightX, 0, 255, 0, 100), two_sided, portrait);
+	//DrawProgressBar(50, 230, 200, 10, map(result.RightY, 0, 255, 0, 100), two_sided, landscape);
+	
 	highPriority++;
 	mediumPriority++;
 	lowPriority++;
@@ -82,6 +84,6 @@ void SetUpPinModes()
 	pinMode(A1, INPUT);
 	pinMode(A2, INPUT);
 	pinMode(A3, INPUT);
-	pinMode(A4, INPUT);
 	analogWrite(20, GetBacklightValue());
 }
+

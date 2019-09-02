@@ -102,6 +102,7 @@ void SetUpLcdConfig()
 
 void PrintHeader(String text, int x)
 {
+	Screen.setColor(255, 255, 255);
 	Screen.print(text, x, 3);
 }
 
@@ -238,25 +239,63 @@ void DrawProgressBar(int startX, int startY, int length, int debth, int value, e
 	Screen.setColor(255, 255, 255);
 	int xEnd = startX + length;
 	int yEnd = startY + debth;
+	
 	if(orientation == landscape)
 	{
-		value = map(value, 0,100, startX, xEnd);
+		int endLocation;
 		Screen.drawRoundRect(startX, startY, xEnd, yEnd);
-		Screen.fillRoundRect(startX, startY, value, yEnd);
-		Screen.setColor(0, 0, 0);
-		Screen.fillRoundRect(value, startY + 1, xEnd, yEnd - 1);
-		if (type == two_sided)
+		if(type == one_sided)
+		{
+			endLocation = map(value, 0, 100, startX, xEnd);
+			Screen.fillRoundRect(startX, startY, endLocation, yEnd);
+			Screen.setColor(0, 0, 0);
+			Screen.fillRoundRect(endLocation, startY + 1, xEnd, yEnd - 1);
+		}
+		else if (type == two_sided)
 		{
 			Screen.drawLine(startX + (length / 2), startY, startX + (length / 2), startY + debth);
+			if (value > 51)
+			{
+				endLocation = map(value, 52, 100, startX + (length / 2), xEnd);
+				Screen.fillRoundRect(startX + (length / 2), startY, endLocation, yEnd);
+				Screen.setColor(0, 0, 0);
+				Screen.fillRoundRect(endLocation, startY + 1, xEnd, yEnd - 1);
+			}
+			else if (value < 49)
+			{
+				endLocation = map(value, 100, 48, startX + (length / 2), startX);
+				Screen.fillRoundRect(startX + (length / 2), startY, endLocation, yEnd);
+				Screen.setColor(0, 0, 0);
+				Screen.fillRoundRect(endLocation, startY + 1, xEnd, yEnd - 1);
+			}
+			PrintFooter(String(value), 150);
 		}
 	}
 	else
 	{
 		Screen.drawRoundRect(startY, startX, yEnd, xEnd);
-		if (type == two_sided)
+		if(type == one_sided)
 		{
-			//Screen.drawLine(startY, startX + (length / 2), startY + debth, startX + (length / 2));
-		}
+			int endLocation = map(value, 100, 0, startX, xEnd);
+			Screen.fillRoundRect(startY, endLocation, yEnd, xEnd);
+			
+			Screen.setColor(0, 0, 0);
+			Screen.fillRoundRect(startY + 1, startY + 1, yEnd - 1, endLocation);
+		}	
+		//else if (type == two_sided)
+		//{
+		// int middleValue = 50;
+		//	Screen.drawLine(startY, startX + (length / 2), startY + debth, startX + (length / 2));
+		//	if (value > 51)
+		//	{
+		//		Screen.fillRoundRect(startX, startY, value, yEnd);
+		//		Screen.setColor(0, 0, 0);
+		//	}
+		//	else if (value < 49)
+		//	{
+		//
+		//	}
+		//}
 	}
 }
 
@@ -267,7 +306,7 @@ void DrawBackButton()
 
 void DrawDrone()
 {
-	//Screen.drawBitmap();
+	Screen.drawBitmap(295, 100, 100, 100, Drone, 2);
 }
 
 void DrawDisplayMenu()
@@ -287,6 +326,8 @@ void DrawButton(int xBegin, int yBegin, int xEnd, int yEnd, String text, enum_te
 	Screen.fillRoundRect(xBegin, yBegin, xEnd, yEnd);
 	Screen.setColor(VGA_WHITE);
 	Screen.setBackColor(0, 10, 255);
+	Screen.setColor(255, 255, 255);
+	Screen.drawRoundRect(xBegin, yBegin, xEnd, yEnd);
 
 	Screen.setFont(font);
 	int xFont = Screen.getFontXsize();
